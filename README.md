@@ -1,4 +1,4 @@
-# Boats.com Shared Packages
+# AI Compare Boats Repos Shared Packages
 
 This repository contains shared packages used across Boats.com web and mobile applications. These packages are designed to work with both React web applications and React Native (Expo) mobile apps.
 
