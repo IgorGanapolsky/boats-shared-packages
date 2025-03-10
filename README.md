@@ -1,104 +1,79 @@
-# AI Compare Boats Repos Shared Packages
+# Boats Shared Packages
 
-This repository contains shared packages used across AI Compare Boats web and mobile applications. These packages are designed to work with both React web applications and React Native (Expo) mobile apps.
+A collection of shared packages for AI Compare Boats applications, designed to be used across web and mobile platforms.
 
 ## Packages
 
-### @boats/core
+- **@boats/core**: Core business logic and utilities for Boats.com applications
+- **@boats/hooks**: React hooks for Boats.com applications
+- **@boats/api**: API client services for Boats.com applications
+- **@boats/types**: Shared TypeScript types for the Boats.com ecosystem
+- **@boats/state**: State management utilities (coming soon)
+- **@boats/ui**: Shared UI components (coming soon)
 
-Core services, utilities, and models for AI Compare Boats applications:
-
-- AI Services: OpenAI and TensorFlow integrations
-- Image Analysis: Computer vision utilities for boat comparison
-- Data Models: Shared data structures and schemas
-- Utilities: Networking, comparison algorithms, etc.
-
-### @boats/hooks
-
-React hooks for use in both web and mobile applications:
-
-- `useImageAnalysis`: Process and analyze boat images
-- `useBoatComparison`: Compare boats and their features
-- `useBoatSize`: Calculate and compare boat dimensions
-- `useFeatureAnalysis`: Analyze boat features and specifications
-
-## Using in Your Project
-
-### Installing the Packages
+## Installation
 
 ```bash
-# For npm
-npm install @boats/core @boats/hooks
-
-# For yarn
-yarn add @boats/core @boats/hooks
-
-# For Expo projects
-expo install @boats/core @boats/hooks
+# Install a specific package
+npm install @boats/core
+# or with yarn
+yarn add @boats/core
 ```
 
-### Setup for Expo Projects
+## Usage
 
-In your Expo mobile app, create a `metro.config.js` file (if not already present):
+### Core Utilities
 
-```javascript
-const { getDefaultConfig } = require('expo/metro-config');
+```typescript
+import { compareBoats, getBoatSimilarity } from '@boats/core';
 
-const config = getDefaultConfig(__dirname);
+// Compare two boats
+const similarity = compareBoats(boatA, boatB);
 
-// Allow importing from external packages
-config.resolver.sourceExts = ['jsx', 'js', 'ts', 'tsx', 'json'];
-config.resolver.extraNodeModules = {
-  '@boats/core': '<path-to-node_modules>/@boats/core',
-  '@boats/hooks': '<path-to-node_modules>/@boats/hooks',
-};
-
-module.exports = config;
+// Get similarity score
+const score = getBoatSimilarity(boatA, boatB);
 ```
 
-### Example Usage
+### Hooks
 
-```javascript
-// In your React or React Native app
-import { OpenAIService } from '@boats/core';
+```typescript
 import { useBoatComparison } from '@boats/hooks';
 
-// Set up OpenAI service
-const openaiService = new OpenAIService({
-  apiKey: process.env.OPENAI_API_KEY,
-  dangerouslyAllowBrowser: true
-});
-
-// Use hooks in your components
-function BoatComparisonScreen() {
-  const { 
-    boats, 
-    selectedBoats, 
-    comparisonResults,
-    compareBoats, 
-    selectBoat 
-  } = useBoatComparison(boatService);
+const MyComponent = () => {
+  const { compareBoats, isLoading, error } = useBoatComparison();
   
-  // Your component logic here
-}
+  // Use the hook in your component
+  return (
+    // ...
+  );
+};
 ```
 
-## Integration with AWS CodeBuild and Fastlane
+### API Services
 
-These packages are designed to be consumed by mobile apps using AWS CodeBuild with Fastlane for CI/CD. The GitHub repository contains workflows for automatic publishing when updates are pushed to the main branch.
+```typescript
+import { BoatService } from '@boats/api';
+
+// Fetch boat data
+const boatData = await BoatService.getBoatById('boat-123');
+```
 
 ## Development
 
-To develop these packages:
-
 ```bash
 # Install dependencies
-cd boats-packages
-npm install
+yarn install
 
 # Build all packages
-npm run build
+yarn build
 
 # Run tests
-npm test
+yarn test
+
+# Lint code
+yarn lint
 ```
+
+## License
+
+MIT

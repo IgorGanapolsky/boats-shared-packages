@@ -1,17 +1,24 @@
 {
-  "name": "boats-packages",
+  "name": "boats-shared-packages",
   "private": true,
   "workspaces": [
-    "boats-core",
-    "boats-hooks"
+    "packages/*"
   ],
   "scripts": {
-    "build": "npm run build --workspaces",
-    "test": "npm run test --workspaces",
-    "lint": "npm run lint --workspaces",
-    "clean": "rm -rf */dist"
+    "build": "yarn workspaces run build",
+    "dev": "yarn workspaces run dev",
+    "lint": "yarn workspaces run lint",
+    "test": "yarn workspaces run test",
+    "clean": "yarn workspaces run clean"
   },
-  "devDependencies": {
-    "typescript": "^5.0.0"
-  }
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/IgorGanapolsky/boats-shared-packages.git"
+  },
+  "author": "Igor Ganapolsky",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/IgorGanapolsky/boats-shared-packages/issues"
+  },
+  "homepage": "https://github.com/IgorGanapolsky/boats-shared-packages#readme"
 }
