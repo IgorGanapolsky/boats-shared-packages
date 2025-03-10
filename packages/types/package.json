@@ -1,5 +1,5 @@
 {
-  "name": "@boats/types",
+  "name": "@igorganapolsky/boats-types",
   "version": "0.1.0",
   "description": "Shared TypeScript types for the Boats.com ecosystem",
   "main": "dist/index.js",

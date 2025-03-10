@@ -1,5 +1,5 @@
 {
-  "name": "@boats/core",
+  "name": "@igorganapolsky/boats-core",
   "version": "0.1.0",
   "description": "Core business logic and utilities for Boats.com applications",
   "main": "dist/index.js",
@@ -17,7 +17,7 @@
     "test": "jest"
   },
   "dependencies": {
-    "@boats/types": "^0.1.0"
+    "@igorganapolsky/boats-types": "^0.1.0"
   },
   "peerDependencies": {
     "openai": "^4.0.0",

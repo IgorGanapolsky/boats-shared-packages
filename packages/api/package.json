@@ -1,5 +1,5 @@
 {
-  "name": "@boats/api",
+  "name": "@igorganapolsky/boats-api",
   "version": "0.1.0",
   "description": "API client services for Boats.com applications",
   "main": "dist/index.js",
@@ -17,8 +17,8 @@
     "test": "jest"
   },
   "dependencies": {
-    "@boats/core": "^0.1.0",
-    "@boats/types": "^0.1.0"
+    "@igorganapolsky/boats-core": "^0.1.0",
+    "@igorganapolsky/boats-types": "^0.1.0"
   },
   "devDependencies": {
     "@types/jest": "^29.5.5",
