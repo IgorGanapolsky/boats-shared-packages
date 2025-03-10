@@ -7,12 +7,12 @@ import {
   post, 
   get, 
   handleApiError 
-} from '@boats/core';
+} from '@igorganapolsky/boats-core';
 import { 
   ApiResponse,
   UserProfile,
   UserPreferences
-} from '@boats/types';
+} from '@igorganapolsky/boats-types';
 import { ApiClientConfig, getApiConfig, createAuthHeaders } from '../config/api-config';
 
 export interface AuthCredentials {

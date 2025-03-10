@@ -4,8 +4,8 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { Theme, ColorPalette } from '@boats/types';
-import { isWeb, isIOS, isAndroid } from '@boats/core';
+import { Theme, ColorPalette } from '@igorganapolsky/boats-types';
+import { isWeb, isIOS, isAndroid } from '@igorganapolsky/boats-core';
 
 // Define base themes that work across platforms
 const lightColors: ColorPalette = {

@@ -3,7 +3,7 @@
  * Provides a unified way to access environment variables across platforms
  */
 
-import { EnvironmentConfig } from '@boats/types';
+import { EnvironmentConfig } from '@igorganapolsky/boats-types';
 
 /**
  * Default environment configuration

@@ -8,11 +8,11 @@ import {
   OpenAIService, 
   TensorFlowService,
   getEnvironmentConfig
-} from '@boats/core';
+} from '@igorganapolsky/boats-core';
 import { 
   ImageAnalysisResult,
   OpenAIServiceConfig
-} from '@boats/types';
+} from '@igorganapolsky/boats-types';
 
 // Query key for caching
 const IMAGE_ANALYSIS_KEY = 'imageAnalysis';

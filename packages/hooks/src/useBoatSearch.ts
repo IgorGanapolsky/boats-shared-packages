@@ -8,8 +8,8 @@ import {
   withRetry,
   fetchWithTimeout,
   getEnvironmentConfig
-} from '@boats/core';
-import { Boat } from '@boats/types';
+} from '@igorganapolsky/boats-core';
+import { Boat } from '@igorganapolsky/boats-types';
 
 // Query key for caching
 const BOAT_SEARCH_KEY = 'boatSearch';

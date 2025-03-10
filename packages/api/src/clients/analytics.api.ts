@@ -10,8 +10,8 @@ import {
   isWeb,
   isIOS,
   isAndroid
-} from '@boats/core';
-import { ApiResponse } from '@boats/types';
+} from '@igorganapolsky/boats-core';
+import { ApiResponse } from '@igorganapolsky/boats-types';
 import { ApiClientConfig, getApiConfig, createAuthHeaders } from '../config/api-config';
 
 export interface AnalyticsEvent {

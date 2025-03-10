@@ -8,7 +8,7 @@ import * as mobilenet from '@tensorflow-models/mobilenet';
 import { 
   TensorFlowServiceInterface, 
   FeatureVector
-} from '@boats/types';
+} from '@igorganapolsky/boats-types';
 
 export class TensorFlowService implements TensorFlowServiceInterface {
   private model: mobilenet.MobileNet | null = null;

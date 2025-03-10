@@ -2,7 +2,7 @@
  * API configuration for Boats.com applications
  */
 
-import { getEnvironmentConfig } from '@boats/core';
+import { getEnvironmentConfig } from '@igorganapolsky/boats-core';
 
 export interface ApiClientConfig {
   baseUrl: string;

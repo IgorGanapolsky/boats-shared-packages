@@ -10,7 +10,7 @@ import {
   OPENAI_ERROR_TYPES,
   OpenAIErrorType,
   Boat
-} from '@boats/types';
+} from '@igorganapolsky/boats-types';
 
 // Constants
 const MAX_RETRIES = 3;

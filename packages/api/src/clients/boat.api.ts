@@ -10,13 +10,13 @@ import {
   del, 
   fetchWithTimeout, 
   handleApiError 
-} from '@boats/core';
+} from '@igorganapolsky/boats-core';
 import { 
   Boat, 
   BoatComparisonResult, 
   ImageAnalysisResult, 
   ApiResponse 
-} from '@boats/types';
+} from '@igorganapolsky/boats-types';
 import { ApiClientConfig, getApiConfig } from '../config/api-config';
 
 export class BoatApiClient {
