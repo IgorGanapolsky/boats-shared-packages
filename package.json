@@ -1,0 +1,17 @@
+{
+  "name": "boats-packages",
+  "private": true,
+  "workspaces": [
+    "boats-core",
+    "boats-hooks"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces",
+    "test": "npm run test --workspaces",
+    "lint": "npm run lint --workspaces",
+    "clean": "rm -rf */dist"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}
