@@ -1,8 +1,13 @@
 /**
- * Core domain models and types for the Boats.com application
+ * @file Core domain models and types for the Boats.com application.
+ * This file exports all the main types used across the Boats.com ecosystem.
+ * @packageDocumentation
  */
 
-// Boat Types
+/**
+ * Base interface for boat information with essential properties.
+ * Contains the minimum required fields for a boat entity.
+ */
 export interface BoatBase {
   id: string;
   name: string;
@@ -11,6 +16,10 @@ export interface BoatBase {
   year?: number;
 }
 
+/**
+ * Physical dimensions and measurements of a boat.
+ * All measurements are typically in standard marine units (feet/meters).
+ */
 export interface BoatDimensions {
   length?: number;
   beam?: number;
@@ -18,6 +27,10 @@ export interface BoatDimensions {
   weight?: number; // in pounds/kg
 }
 
+/**
+ * Optional features and specifications of a boat.
+ * These properties describe the boat's capabilities and equipment.
+ */
 export interface BoatFeatures {
   engineType?: string;
   hullType?: string;
@@ -27,13 +40,24 @@ export interface BoatFeatures {
   features: string[];
 }
 
+/**
+ * Media assets associated with a boat listing.
+ * Includes images, videos, and other visual content.
+ */
 export interface BoatMedia {
   imageUrls: string[];
   primaryImageUrl?: string;
   videoUrls?: string[];
 }
 
-// Complete Boat model with all properties
+/**
+ * Complete Boat model that combines all boat-related interfaces.
+ * This is the primary type used for boat listings and comparisons.
+ * @extends BoatBase - Core boat information
+ * @extends BoatDimensions - Physical measurements
+ * @extends BoatFeatures - Optional features and equipment
+ * @extends BoatMedia - Associated media content
+ */
 export interface Boat extends BoatBase, BoatDimensions, BoatFeatures, BoatMedia {
   description?: string;
   price?: number;
@@ -43,7 +67,10 @@ export interface Boat extends BoatBase, BoatDimensions, BoatFeatures, BoatMedia 
   categoryTags?: string[];
 }
 
-// AI Analysis Types
+/**
+ * Results from AI-powered image analysis of a boat.
+ * Contains detected features and attributes with confidence scores.
+ */
 export interface ImageAnalysisResult {
   boatType?: string;
   manufacturer?: string;
@@ -55,6 +82,10 @@ export interface ImageAnalysisResult {
   confidenceScore?: number;
 }
 
+/**
+ * Results from comparing two boats.
+ * Includes similarities, differences, and recommendations.
+ */
 export interface BoatComparisonResult {
   boat1: Boat;
   boat2: Boat;
@@ -79,7 +110,10 @@ export interface ApiResponse<T> {
   };
 }
 
-// Configuration Types
+/**
+ * Application environment configuration.
+ * Defines feature flags, API endpoints, and other configurable settings.
+ */
 export interface EnvironmentConfig {
   apiUrl: string;
   openAiApiKey?: string;

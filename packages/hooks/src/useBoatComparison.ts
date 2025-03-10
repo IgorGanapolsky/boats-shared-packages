@@ -1,5 +1,8 @@
 /**
- * Hook for comparing boats using the OpenAI and TensorFlow services
+ * @file Hook for comparing boats using the OpenAI and TensorFlow services.
+ * @module boats-hooks/useBoatComparison
+ * @description This hook provides a React interface for the boat comparison service,
+ * with options for using different AI models and caching results.
  */
 
 import { useState, useCallback } from 'react';
@@ -8,22 +11,30 @@ import {
   OpenAIService, 
   TensorFlowService,
   getEnvironmentConfig
-} from '@boats/core';
+} from '@igorganapolsky/boats-core';
 import { 
   Boat,
   BoatComparisonResult,
   OpenAIServiceConfig
-} from '@boats/types';
+} from '@igorganapolsky/boats-types';
 
-// Query key for caching
+/**
+ * Query key for caching comparison results in React Query
+ */
 const BOAT_COMPARISON_KEY = 'boatComparison';
 
+/**
+ * Options for configuring the boat comparison hook
+ */
 interface UseBoatComparisonOptions {
   openAIConfig?: OpenAIServiceConfig;
   onComparisonComplete?: (result: BoatComparisonResult) => void;
   onError?: (error: Error) => void;
 }
 
+/**
+ * State object for tracking boat comparison status
+ */
 interface ComparisonState {
   isComparing: boolean;
   progress: string;
@@ -212,8 +223,16 @@ export function useBoatComparison(options: UseBoatComparisonOptions = {}) {
   };
 }
 
-// Helper functions to extract information from the comparison text
+/**
+ * Helper functions to extract structured information from the AI-generated comparison text
+ * @internal These functions are used internally by the hook
+ */
 
+/**
+ * Extract similarity statements from the AI-generated comparison text
+ * @param text - The AI-generated comparison text
+ * @returns Array of similarity statements
+ */
 function extractSimilarities(text: string): string[] {
   const similarities: string[] = [];
   
@@ -236,6 +255,11 @@ function extractSimilarities(text: string): string[] {
   return similarities;
 }
 
+/**
+ * Extract difference statements from the AI-generated comparison text
+ * @param text - The AI-generated comparison text
+ * @returns Array of difference statements
+ */
 function extractDifferences(text: string): string[] {
   const differences: string[] = [];
   
@@ -258,6 +282,11 @@ function extractDifferences(text: string): string[] {
   return differences;
 }
 
+/**
+ * Extract recommendation statement from the AI-generated comparison text
+ * @param text - The AI-generated comparison text
+ * @returns Recommendation statement or undefined if none found
+ */
 function extractRecommendation(text: string): string | undefined {
   // Look for recommendation or conclusion section
   const recommendationSection = 

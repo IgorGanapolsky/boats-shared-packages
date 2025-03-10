@@ -1,6 +1,8 @@
 /**
- * Boat matching utilities for finding and comparing similar boats
- * These utilities provide mechanisms to match boats based on various criteria
+ * @file Boat matching utilities for finding and comparing similar boats.
+ * @module boats-core/utils/boat-matching
+ * @description These utilities provide mechanisms to match boats based on various criteria
+ * including dimensions, features, manufacturer, and model information.
  */
 
 import { Boat } from '../types';
