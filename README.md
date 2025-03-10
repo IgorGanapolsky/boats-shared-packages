@@ -1,12 +1,12 @@
 # AI Compare Boats Repos Shared Packages
 
-This repository contains shared packages used across Boats.com web and mobile applications. These packages are designed to work with both React web applications and React Native (Expo) mobile apps.
+This repository contains shared packages used across AI Compare Boats web and mobile applications. These packages are designed to work with both React web applications and React Native (Expo) mobile apps.
 
 ## Packages
 
 ### @boats/core
 
-Core services, utilities, and models for Boats.com applications:
+Core services, utilities, and models for AI Compare Boats applications:
 
 - AI Services: OpenAI and TensorFlow integrations
 - Image Analysis: Computer vision utilities for boat comparison
