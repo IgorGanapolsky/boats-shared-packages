@@ -6,7 +6,6 @@
 
 import { 
   post, 
-  handleApiError,
   isWeb,
   isIOS,
   isAndroid
@@ -24,9 +23,9 @@ export interface AnalyticsEvent {
 }
 
 export class AnalyticsApiClient {
-  private config: ApiClientConfig;
-  private sessionId: string;
-  private deviceInfo: Record<string, any>;
+  private readonly config: ApiClientConfig;
+  private readonly sessionId: string;
+  private readonly deviceInfo: Record<string, any>;
   private userId: string | null = null;
   
   constructor(config?: Partial<ApiClientConfig>) {
@@ -64,9 +63,11 @@ export class AnalyticsApiClient {
       // Don't throw for analytics errors, just log them
       console.error('Analytics error:', error);
       return {
-        success: false,
         data: false,
-        message: 'Failed to track event'
+        error: {
+          code: 'ANALYTICS_ERROR',
+          message: 'Failed to track event'
+        }
       };
     }
   }

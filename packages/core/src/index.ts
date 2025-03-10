@@ -37,5 +37,4 @@ export {
 // Export config management
 export * from './config/environment';
 
-// Temporary types
-export * from './types';
+// Types are now in the types package

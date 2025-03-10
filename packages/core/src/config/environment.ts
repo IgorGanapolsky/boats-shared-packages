@@ -23,8 +23,13 @@ const defaultConfig: EnvironmentConfig = {
  */
 export function getEnvironmentConfig(): EnvironmentConfig {
   // Handle different environments (web, React Native)
-  const env = typeof process !== 'undefined' ? process.env : 
-             typeof globalThis !== 'undefined' ? (globalThis as any).env : {};
+  // Determine which environment object to use
+  let env: Record<string, string | undefined> = {};
+  if (typeof process !== 'undefined' && process.env) {
+    env = process.env as Record<string, string | undefined>;
+  } else if (typeof globalThis !== 'undefined' && (globalThis as any).env) {
+    env = (globalThis as any).env as Record<string, string | undefined>;
+  }
   
   return {
     apiUrl: env.REACT_APP_API_URL || env.EXPO_API_URL || defaultConfig.apiUrl,
@@ -73,8 +78,15 @@ export function isDevelopment(): boolean {
     return process.env.NODE_ENV === 'development';
   }
   
-  if (typeof __DEV__ !== 'undefined') {
-    return __DEV__ === true;
+  // For React Native environments
+  try {
+    // @ts-ignore - __DEV__ is defined in React Native
+    if (typeof __DEV__ !== 'undefined') {
+      // @ts-ignore
+      return __DEV__ === true;
+    }
+  } catch (e) {
+    // Ignore error if __DEV__ is not defined
   }
   
   return false;
@@ -91,7 +103,16 @@ export function isWeb(): boolean {
  * Determine if code is running in React Native
  */
 export function isReactNative(): boolean {
-  return typeof navigator !== 'undefined' && navigator.product === 'ReactNative';
+  // Check for React Native environment
+  // navigator.product is deprecated, using a more reliable check
+  return typeof navigator !== 'undefined' && 
+    // @ts-ignore
+    // Removed deprecated navigator.product check
+    (typeof navigator !== 'undefined' && ('ReactNative' in navigator) || 
+     // Check for newer RN environment indicators
+     typeof global !== 'undefined' && 
+     // Use 'in' operator instead of hasOwnProperty
+     ('ReactNative' in global));
 }
 
 /**

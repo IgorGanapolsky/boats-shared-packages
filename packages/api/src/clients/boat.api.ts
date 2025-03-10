@@ -8,7 +8,6 @@ import {
   post, 
   put, 
   del, 
-  fetchWithTimeout, 
   handleApiError 
 } from '@igorganapolsky/boats-core';
 import { 
@@ -162,9 +161,9 @@ export class BoatApiClient {
         formData,
         { 
           headers: {
-            // No Content-Type header for FormData
-            ...this.config.headers,
-            'Content-Type': undefined
+            // No Content-Type header for FormData, let browser set it automatically
+            ...this.config.headers
+            // Removing explicit undefined Content-Type to fix type error
           },
           timeout: this.config.timeout * 2 // Longer timeout for image analysis
         }

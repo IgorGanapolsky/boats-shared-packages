@@ -66,7 +66,7 @@ export function useBoatComparison(options: UseBoatComparisonOptions = {}) {
   const tensorflowService = new TensorFlowService();
   
   // State for tracking comparison progress
-  const [comparisonState, setComparisonState] = useState<ComparisonState>({
+  const [comparisonState, setComparisonState] = useState({
     isComparing: false,
     progress: '',
     error: null,
@@ -74,7 +74,7 @@ export function useBoatComparison(options: UseBoatComparisonOptions = {}) {
   });
   
   // Track selected boats for caching
-  const [selectedBoats, setSelectedBoats] = useState<[Boat | null, Boat | null]>([null, null]);
+  const [selectedBoats, setSelectedBoats] = useState([null, null] as [Boat | null, Boat | null]);
   
   // Calculate a cache key for the selected boats
   const boatCacheKey = useCallback((boat1?: Boat | null, boat2?: Boat | null): string => {
@@ -83,7 +83,7 @@ export function useBoatComparison(options: UseBoatComparisonOptions = {}) {
   }, []);
   
   // Query for getting cached comparison results
-  const { data: cachedComparison } = useQuery({
+  const { data: cachedComparison } = useQuery<BoatComparisonResult | undefined>({
     queryKey: [BOAT_COMPARISON_KEY, boatCacheKey(selectedBoats[0], selectedBoats[1])],
     enabled: !!selectedBoats[0] && !!selectedBoats[1], // Only run if we have two boats selected
     staleTime: 1000 * 60 * 30, // Consider results stale after 30 minutes
@@ -92,7 +92,7 @@ export function useBoatComparison(options: UseBoatComparisonOptions = {}) {
   });
   
   // Mutation for comparing boats
-  const { mutateAsync: compareBoats } = useMutation({
+  const { mutateAsync: compareBoats } = useMutation<BoatComparisonResult, Error, [Boat, Boat]>({
     mutationFn: async (boats: [Boat, Boat]): Promise<BoatComparisonResult> => {
       const [boat1, boat2] = boats;
       
@@ -100,8 +100,8 @@ export function useBoatComparison(options: UseBoatComparisonOptions = {}) {
         throw new Error('Two boats are required for comparison');
       }
       
-      setSelectedBoats([boat1, boat2]);
-      setComparisonState(prev => ({
+      setSelectedBoats([boat1, boat2] as [Boat | null, Boat | null]);
+      setComparisonState((prev: ComparisonState) => ({
         ...prev,
         isComparing: true,
         progress: 'Starting comparison...',
@@ -115,7 +115,7 @@ export function useBoatComparison(options: UseBoatComparisonOptions = {}) {
         if (envConfig.tensorflowEnabled && 
             boat1.imageUrls?.length && 
             boat2.imageUrls?.length) {
-          setComparisonState(prev => ({
+          setComparisonState((prev: ComparisonState) => ({
             ...prev,
             progress: 'Analyzing visual similarities...'
           }));
@@ -131,7 +131,7 @@ export function useBoatComparison(options: UseBoatComparisonOptions = {}) {
         }
         
         // Step 2: Use OpenAI for a natural language comparison
-        setComparisonState(prev => ({
+        setComparisonState((prev: ComparisonState) => ({
           ...prev,
           progress: 'Generating detailed comparison...'
         }));
@@ -139,7 +139,7 @@ export function useBoatComparison(options: UseBoatComparisonOptions = {}) {
         const comparisonText = await openAIService.compareBoats(boat1, boat2);
         
         // Step 3: Process the comparison text to find key points
-        setComparisonState(prev => ({
+        setComparisonState((prev: ComparisonState) => ({
           ...prev,
           progress: 'Extracting comparison insights...'
         }));
@@ -161,7 +161,7 @@ export function useBoatComparison(options: UseBoatComparisonOptions = {}) {
         };
         
         // Update state with the result
-        setComparisonState(prev => ({
+        setComparisonState((prev: ComparisonState) => ({
           ...prev,
           isComparing: false,
           progress: 'Comparison complete',
@@ -176,7 +176,7 @@ export function useBoatComparison(options: UseBoatComparisonOptions = {}) {
         return result;
       } catch (error) {
         const errorObj = error instanceof Error ? error : new Error(String(error));
-        setComparisonState(prev => ({
+        setComparisonState((prev: ComparisonState) => ({
           ...prev,
           isComparing: false,
           progress: 'Comparison failed',
@@ -205,8 +205,9 @@ export function useBoatComparison(options: UseBoatComparisonOptions = {}) {
   
   // Helper function to select a boat for comparison
   const selectBoat = useCallback((boat: Boat, position: 0 | 1) => {
-    setSelectedBoats(prev => {
-      const newSelection: [Boat | null, Boat | null] = [...prev];
+    setSelectedBoats((prev: [Boat | null, Boat | null]) => {
+      // Create a copy of the array with proper typing
+      const newSelection: [Boat | null, Boat | null] = [prev[0], prev[1]];
       newSelection[position] = boat;
       return newSelection;
     });
@@ -237,10 +238,24 @@ function extractSimilarities(text: string): string[] {
   const similarities: string[] = [];
   
   // Look for sections about similarities
-  const similaritiesSection = 
-    text.match(/similarities:?\s*([\s\S]*?)(?=differences:|advantages:|recommendation:|$)/i)?.[1] ||
-    text.match(/both boats:?\s*([\s\S]*?)(?=differences:|advantages:|recommendation:|$)/i)?.[1] ||
-    text.match(/common features:?\s*([\s\S]*?)(?=differences:|advantages:|recommendation:|$)/i)?.[1];
+  // Find similarities section using regex patterns
+  let similaritiesSection: string | undefined;
+  const similaritiesRegex = /similarities:?\s*([\s\S]*?)(?=differences:|advantages:|recommendation:|$)/i;
+  const bothBoatsRegex = /both boats:?\s*([\s\S]*?)(?=differences:|advantages:|recommendation:|$)/i;
+  const commonFeaturesRegex = /common features:?\s*([\s\S]*?)(?=differences:|advantages:|recommendation:|$)/i;
+  
+  const match1 = similaritiesRegex.exec(text);
+  similaritiesSection = match1?.[1];
+  
+  if (!similaritiesSection) {
+    const match2 = bothBoatsRegex.exec(text);
+    similaritiesSection = match2?.[1];
+  }
+  
+  if (!similaritiesSection) {
+    const match3 = commonFeaturesRegex.exec(text);
+    similaritiesSection = match3?.[1];
+  }
   
   if (similaritiesSection) {
     // Split by bullet points, numbers, or new lines
@@ -264,10 +279,24 @@ function extractDifferences(text: string): string[] {
   const differences: string[] = [];
   
   // Look for sections about differences
-  const differencesSection = 
-    text.match(/differences:?\s*([\s\S]*?)(?=similarities:|advantages:|recommendation:|$)/i)?.[1] ||
-    text.match(/key differences:?\s*([\s\S]*?)(?=similarities:|advantages:|recommendation:|$)/i)?.[1] ||
-    text.match(/distinguishing features:?\s*([\s\S]*?)(?=similarities:|advantages:|recommendation:|$)/i)?.[1];
+  // Find differences section using regex patterns
+  let differencesSection: string | undefined;
+  const differencesRegex = /differences:?\s*([\s\S]*?)(?=similarities:|advantages:|recommendation:|$)/i;
+  const keyDifferencesRegex = /key differences:?\s*([\s\S]*?)(?=similarities:|advantages:|recommendation:|$)/i;
+  const distinguishingRegex = /distinguishing features:?\s*([\s\S]*?)(?=similarities:|advantages:|recommendation:|$)/i;
+  
+  const match1 = differencesRegex.exec(text);
+  differencesSection = match1?.[1];
+  
+  if (!differencesSection) {
+    const match2 = keyDifferencesRegex.exec(text);
+    differencesSection = match2?.[1];
+  }
+  
+  if (!differencesSection) {
+    const match3 = distinguishingRegex.exec(text);
+    differencesSection = match3?.[1];
+  }
   
   if (differencesSection) {
     // Split by bullet points, numbers, or new lines
@@ -289,10 +318,24 @@ function extractDifferences(text: string): string[] {
  */
 function extractRecommendation(text: string): string | undefined {
   // Look for recommendation or conclusion section
-  const recommendationSection = 
-    text.match(/recommendation:?\s*([\s\S]*?)(?=similarities:|differences:|conclusion:|$)/i)?.[1] ||
-    text.match(/conclusion:?\s*([\s\S]*?)(?=similarities:|differences:|recommendation:|$)/i)?.[1] ||
-    text.match(/summary:?\s*([\s\S]*?)(?=similarities:|differences:|recommendation:|$)/i)?.[1];
+  // Find recommendation section using regex patterns
+  let recommendationSection: string | undefined;
+  const recommendationRegex = /recommendation:?\s*([\s\S]*?)(?=similarities:|differences:|conclusion:|$)/i;
+  const conclusionRegex = /conclusion:?\s*([\s\S]*?)(?=similarities:|differences:|recommendation:|$)/i;
+  const summaryRegex = /summary:?\s*([\s\S]*?)(?=similarities:|differences:|recommendation:|$)/i;
+  
+  const match1 = recommendationRegex.exec(text);
+  recommendationSection = match1?.[1];
+  
+  if (!recommendationSection) {
+    const match2 = conclusionRegex.exec(text);
+    recommendationSection = match2?.[1];
+  }
+  
+  if (!recommendationSection) {
+    const match3 = summaryRegex.exec(text);
+    recommendationSection = match3?.[1];
+  }
   
   if (recommendationSection) {
     return recommendationSection.trim();
