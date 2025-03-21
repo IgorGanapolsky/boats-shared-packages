@@ -1,5 +1,5 @@
 {
-  "name": "@igorganapolsky/boats-api",
+  "name": "@boats/api",
   "version": "0.1.0",
   "description": "API client services for Boats.com applications",
   "main": "dist/index.js",
@@ -10,16 +10,16 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsup src/index.ts --format esm,cjs --external '@igorganapolsky/boats-core' --external '@igorganapolsky/boats-types'",
-    "build:dts": "tsup src/index.ts --format esm,cjs --dts --ignore-watch node_modules --external '@igorganapolsky/boats-core' --external '@igorganapolsky/boats-types'",
+    "build": "tsup src/index.ts --format esm,cjs --external '@boats/core' --external '@boats/types'",
+    "build:dts": "tsup src/index.ts --format esm,cjs --dts --ignore-watch node_modules --external '@boats/core' --external '@boats/types'",
     "dev": "tsup src/index.ts --format esm,cjs --dts --watch",
     "lint": "eslint \"src/**/*.ts*\"",
     "clean": "rm -rf dist",
     "test": "jest"
   },
   "dependencies": {
-    "@igorganapolsky/boats-core": "^0.1.0",
-    "@igorganapolsky/boats-types": "^0.1.0"
+    "@boats/core": "^0.1.0",
+    "@boats/types": "^0.1.0"
   },
   "devDependencies": {
     "@types/jest": "^29.5.5",

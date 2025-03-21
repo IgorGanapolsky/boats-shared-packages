@@ -1,7 +1,7 @@
 {
-  "name": "@igorganapolsky/boats-types",
+  "name": "@boats/types",
   "version": "0.1.0",
-  "description": "Shared TypeScript types for the Boats.com ecosystem",
+  "description": "Shared TypeScript types for Boats.com applications",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
@@ -10,7 +10,8 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsup src/index.ts --format esm,cjs --dts",
+    "build": "tsup src/index.ts --format esm,cjs",
+    "build:dts": "tsup src/index.ts --format esm,cjs --dts",
     "dev": "tsup src/index.ts --format esm,cjs --dts --watch",
     "lint": "eslint \"src/**/*.ts*\"",
     "clean": "rm -rf dist",

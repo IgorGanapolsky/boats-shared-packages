@@ -9,13 +9,13 @@ import {
   put, 
   del, 
   handleApiError 
-} from '@igorganapolsky/boats-core';
+} from '@boats/core';
 import { 
   Boat, 
   BoatComparisonResult, 
   ImageAnalysisResult, 
   ApiResponse 
-} from '@igorganapolsky/boats-types';
+} from '@boats/types';
 import { ApiClientConfig, getApiConfig } from '../config/api-config';
 
 export class BoatApiClient {
@@ -30,33 +30,24 @@ export class BoatApiClient {
    */
   async getBoats(params?: URLSearchParams): Promise<ApiResponse<Boat[]>> {
     try {
-      const queryParams = params ? `?${params.toString()}` : '';
-      return await get<ApiResponse<Boat[]>>(
-        `${this.config.baseUrl}/boats${queryParams}`,
-        { 
-          headers: this.config.headers,
-          timeout: this.config.timeout
-        }
-      );
+      const url = `${this.config.apiUrl}/boats`;
+      const response = await get<Boat[]>(url, params);
+      return { data: response, error: null };
     } catch (error) {
-      throw handleApiError(error);
+      return handleApiError<Boat[]>(error, 'Failed to fetch boats');
     }
   }
   
   /**
    * Get a single boat by ID
    */
-  async getBoatById(id: string): Promise<ApiResponse<Boat>> {
+  async getBoat(id: string): Promise<ApiResponse<Boat>> {
     try {
-      return await get<ApiResponse<Boat>>(
-        `${this.config.baseUrl}/boats/${id}`,
-        { 
-          headers: this.config.headers,
-          timeout: this.config.timeout
-        }
-      );
+      const url = `${this.config.apiUrl}/boats/${id}`;
+      const response = await get<Boat>(url);
+      return { data: response, error: null };
     } catch (error) {
-      throw handleApiError(error);
+      return handleApiError<Boat>(error, `Failed to fetch boat with ID: ${id}`);
     }
   }
   
@@ -65,16 +56,11 @@ export class BoatApiClient {
    */
   async createBoat(boat: Partial<Boat>): Promise<ApiResponse<Boat>> {
     try {
-      return await post<ApiResponse<Boat>>(
-        `${this.config.baseUrl}/boats`,
-        boat,
-        { 
-          headers: this.config.headers,
-          timeout: this.config.timeout
-        }
-      );
+      const url = `${this.config.apiUrl}/boats`;
+      const response = await post<Boat>(url, boat);
+      return { data: response, error: null };
     } catch (error) {
-      throw handleApiError(error);
+      return handleApiError<Boat>(error, 'Failed to create boat');
     }
   }
   
@@ -83,16 +69,11 @@ export class BoatApiClient {
    */
   async updateBoat(id: string, boat: Partial<Boat>): Promise<ApiResponse<Boat>> {
     try {
-      return await put<ApiResponse<Boat>>(
-        `${this.config.baseUrl}/boats/${id}`,
-        boat,
-        { 
-          headers: this.config.headers,
-          timeout: this.config.timeout
-        }
-      );
+      const url = `${this.config.apiUrl}/boats/${id}`;
+      const response = await put<Boat>(url, boat);
+      return { data: response, error: null };
     } catch (error) {
-      throw handleApiError(error);
+      return handleApiError<Boat>(error, `Failed to update boat with ID: ${id}`);
     }
   }
   
@@ -101,15 +82,24 @@ export class BoatApiClient {
    */
   async deleteBoat(id: string): Promise<ApiResponse<boolean>> {
     try {
-      return await del<ApiResponse<boolean>>(
-        `${this.config.baseUrl}/boats/${id}`,
-        { 
-          headers: this.config.headers,
-          timeout: this.config.timeout
-        }
-      );
+      const url = `${this.config.apiUrl}/boats/${id}`;
+      await del(url);
+      return { data: true, error: null };
     } catch (error) {
-      throw handleApiError(error);
+      return handleApiError<boolean>(error, `Failed to delete boat with ID: ${id}`);
+    }
+  }
+  
+  /**
+   * Compare two boats
+   */
+  async compareBoats(boat1Id: string, boat2Id: string): Promise<ApiResponse<BoatComparisonResult>> {
+    try {
+      const url = `${this.config.apiUrl}/boats/compare`;
+      const response = await post<BoatComparisonResult>(url, { boat1Id, boat2Id });
+      return { data: response, error: null };
+    } catch (error) {
+      return handleApiError<BoatComparisonResult>(error, 'Failed to compare boats');
     }
   }
   
@@ -119,32 +109,11 @@ export class BoatApiClient {
   async searchBoats(query: string): Promise<ApiResponse<Boat[]>> {
     try {
       const params = new URLSearchParams({ q: query });
-      return await get<ApiResponse<Boat[]>>(
-        `${this.config.baseUrl}/boats/search?${params.toString()}`,
-        { 
-          headers: this.config.headers,
-          timeout: this.config.timeout
-        }
-      );
+      const url = `${this.config.apiUrl}/boats/search?${params.toString()}`;
+      const response = await get<Boat[]>(url);
+      return { data: response, error: null };
     } catch (error) {
-      throw handleApiError(error);
-    }
-  }
-  
-  /**
-   * Compare two boats
-   */
-  async compareBoats(boat1Id: string, boat2Id: string): Promise<ApiResponse<BoatComparisonResult>> {
-    try {
-      return await get<ApiResponse<BoatComparisonResult>>(
-        `${this.config.baseUrl}/boats/compare?boat1=${boat1Id}&boat2=${boat2Id}`,
-        { 
-          headers: this.config.headers,
-          timeout: this.config.timeout * 2 // Longer timeout for comparison
-        }
-      );
-    } catch (error) {
-      throw handleApiError(error);
+      return handleApiError<Boat[]>(error, 'Failed to search boats');
     }
   }
   
@@ -156,20 +125,11 @@ export class BoatApiClient {
       const formData = new FormData();
       formData.append('image', imageData);
       
-      return await post<ApiResponse<ImageAnalysisResult>>(
-        `${this.config.baseUrl}/boats/analyze`,
-        formData,
-        { 
-          headers: {
-            // No Content-Type header for FormData, let browser set it automatically
-            ...this.config.headers
-            // Removing explicit undefined Content-Type to fix type error
-          },
-          timeout: this.config.timeout * 2 // Longer timeout for image analysis
-        }
-      );
+      const url = `${this.config.apiUrl}/boats/analyze`;
+      const response = await post<ImageAnalysisResult>(url, formData);
+      return { data: response, error: null };
     } catch (error) {
-      throw handleApiError(error);
+      return handleApiError<ImageAnalysisResult>(error, 'Failed to analyze image');
     }
   }
   
@@ -178,16 +138,11 @@ export class BoatApiClient {
    */
   async findSimilarBoats(analysis: ImageAnalysisResult): Promise<ApiResponse<Boat[]>> {
     try {
-      return await post<ApiResponse<Boat[]>>(
-        `${this.config.baseUrl}/boats/similar`,
-        analysis,
-        { 
-          headers: this.config.headers,
-          timeout: this.config.timeout
-        }
-      );
+      const url = `${this.config.apiUrl}/boats/similar`;
+      const response = await post<Boat[]>(url, analysis);
+      return { data: response, error: null };
     } catch (error) {
-      throw handleApiError(error);
+      return handleApiError<Boat[]>(error, 'Failed to find similar boats');
     }
   }
   
@@ -196,15 +151,70 @@ export class BoatApiClient {
    */
   async getBoatStatistics(): Promise<ApiResponse<Record<string, any>>> {
     try {
-      return await get<ApiResponse<Record<string, any>>>(
-        `${this.config.baseUrl}/boats/statistics`,
-        { 
-          headers: this.config.headers,
-          timeout: this.config.timeout
-        }
-      );
+      const url = `${this.config.apiUrl}/boats/statistics`;
+      const response = await get<Record<string, any>>(url);
+      return { data: response, error: null };
     } catch (error) {
-      throw handleApiError(error);
+      return handleApiError<Record<string, any>>(error, 'Failed to get boat statistics');
     }
   }
 }
+
+/**
+ * Standalone function to get boat details - for React Native compatibility
+ * @param id Boat identifier
+ * @returns Boat details
+ */
+export const getBoatDetails = async (id: string): Promise<Boat> => {
+  try {
+    // In a real implementation, this would connect to the API
+    // For now, return mock data for mobile app development
+    
+    // Simulate network delay
+    await new Promise(resolve => setTimeout(resolve, 800));
+    
+    return {
+      id,
+      name: `Boat ${id}`,
+      type: 'yacht',
+      manufacturer: 'Example Manufacturer',
+      model: 'Luxury 42',
+      year: 2023,
+      length: 42,
+      beam: 14,
+      draft: 4.5,
+      price: 550000,
+      description: 'A beautiful luxury yacht with modern amenities and excellent condition.',
+      features: [
+        'Flybridge',
+        'Swim Platform',
+        'Bow Thruster',
+        'Generator',
+        'Air Conditioning',
+        'Watermaker'
+      ],
+      specifications: {
+        'Engine Type': 'Twin Diesel',
+        'Engine Hours': 350,
+        'Fuel Capacity': '450 gallons',
+        'Water Capacity': '150 gallons',
+        'Hull Material': 'Fiberglass',
+        'Location': 'Miami, FL'
+      },
+      images: [
+        {
+          url: 'https://example.com/boats/yacht1.jpg',
+          caption: 'Port side view'
+        }
+      ],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+  } catch (error) {
+    console.error('Error fetching boat details:', error);
+    throw new Error(`Failed to get boat details: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
+};
+
+// Export singleton instance
+export const boatApiClient = new BoatApiClient();

@@ -59,340 +59,157 @@ export class ImageAnalysisService {
       // Identify boat type and characteristics
       const boatType = this.identifyBoatType(analysisText);
       const manufacturer = this.identifyManufacturer(analysisText);
-      const model = this.identifyModel(analysisText);
-      const estimatedSize = this.estimateBoatSize(analysisText);
-      const suitableActivities = this.identifySuitableActivities(analysisText);
       
-      // Calculate confidence score
-      const confidenceScore = this.calculateConfidenceScore(analysisText);
+      // Identify additional attributes
+      const year = this.extractYear(analysisText);
+      const length = this.extractLength(analysisText);
       
       return {
         boatType,
         manufacturer,
-        model,
-        estimatedSize: this.formatEstimatedSize(estimatedSize),
+        year,
+        length,
         features,
-        description: this.generateDescription(analysisText),
-        suitableActivities,
-        confidenceScore
+        confidence: 0.85, // Default confidence
+        rawAnalysis: analysisText
       };
     } catch (error) {
       console.error('Error analyzing image:', error);
-      throw new Error(`Failed to analyze image: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      
+      // Return basic result with error
+      return {
+        boatType: 'unknown',
+        manufacturer: 'unknown',
+        year: 0,
+        length: 0,
+        features: [],
+        confidence: 0,
+        error: error instanceof Error ? error.message : 'Unknown error',
+        rawAnalysis: ''
+      };
     }
   }
   
-  /**
-   * Extract features from analysis text
-   * @param analysisText The text analysis from OpenAI
-   * @returns Array of boat features
-   */
-  public extractFeatures(analysisText: string): string[] {
-    // Common boat features to look for
-    const commonFeatures = [
-      'cabin', 'flybridge', 'bow thruster', 'stern thruster', 'swim platform',
-      'solar panels', 'generator', 'air conditioning', 'heating', 'refrigerator',
-      'gps', 'radar', 'autopilot', 'depth sounder', 'fish finder',
-      'trolling motor', 'outriggers', 'tower', 'hardtop', 'bimini',
-      'anchor windlass', 'live well', 'fish box', 'rod holders', 'sunpad',
-      'swim ladder', 'shower', 'head', 'galley', 'berth', 'stateroom'
-    ];
-    
-    // Extract mentioned features
-    const features: string[] = [];
-    
-    commonFeatures.forEach(feature => {
-      if (analysisText.toLowerCase().includes(feature.toLowerCase())) {
-        // Capitalize first letter of each word
-        const formattedFeature = feature
-          .split(' ')
-          .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-          .join(' ');
-        
-        features.push(formattedFeature);
-      }
-    });
-    
-    // Add additional features based on contextual clues
-    if (analysisText.toLowerCase().includes('luxury') || 
-        analysisText.toLowerCase().includes('premium')) {
-      features.push('Luxury Amenities');
-    }
-    
-    if (analysisText.toLowerCase().includes('family') || 
-        analysisText.toLowerCase().includes('comfortable')) {
-      features.push('Family-Friendly');
-    }
-    
-    if (analysisText.toLowerCase().includes('offshore') || 
-        analysisText.toLowerCase().includes('deep sea')) {
-      features.push('Offshore Capable');
-    }
-    
-    return features;
+  // Helper methods to extract information from analysis text
+  private extractFeatures(text: string): string[] {
+    // Simple extraction based on commas and bullet points
+    return text
+      .split(/[,•\n]/)
+      .map(item => item.trim())
+      .filter(item => item.length > 3 && item.length < 50);
   }
   
-  /**
-   * Identify boat type from analysis text
-   * @param analysisText The text analysis from OpenAI
-   * @returns Identified boat type or undefined
-   */
-  public identifyBoatType(analysisText: string): string | undefined {
-    // Common boat types to identify
+  private identifyBoatType(text: string): string {
     const boatTypes = [
-      'pontoon', 'deck boat', 'bowrider', 'center console', 'cabin cruiser',
-      'express cruiser', 'cuddy cabin', 'catamaran', 'power catamaran', 'sailboat',
-      'motor yacht', 'trawler', 'sport fishing', 'fishing boat', 'bass boat',
-      'jet boat', 'personal watercraft', 'runabout', 'tender', 'dinghy',
-      'inflatable', 'rigid inflatable', 'jon boat', 'skiff', 'flats boat',
-      'console boat', 'dual console', 'walkaround', 'sedan bridge', 'flybridge',
-      'convertible', 'express', 'high performance', 'sport boat', 'wakeboard boat',
-      'ski boat', 'houseboats'
+      'yacht', 'sailboat', 'motorboat', 'fishing boat', 
+      'speedboat', 'pontoon', 'cruiser', 'catamaran'
     ];
     
-    // Find the first matching boat type in the analysis
     for (const type of boatTypes) {
-      if (analysisText.toLowerCase().includes(type.toLowerCase())) {
-        // Capitalize first letter of each word
-        return type
-          .split(' ')
-          .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-          .join(' ');
+      if (text.toLowerCase().includes(type)) {
+        return type;
       }
     }
     
-    return undefined;
+    return 'boat'; // Default if no specific type is found
   }
   
-  /**
-   * Identify manufacturer from analysis text
-   * @param analysisText The text analysis from OpenAI
-   * @returns Identified manufacturer or undefined
-   */
-  private identifyManufacturer(analysisText: string): string | undefined {
-    // Common boat manufacturers
+  private identifyManufacturer(text: string): string {
+    // This would ideally use a database of manufacturers
+    // Simplified implementation for now
     const manufacturers = [
-      'Sea Ray', 'Bayliner', 'Boston Whaler', 'Chaparral', 'Grady-White',
-      'Cobalt', 'MasterCraft', 'Formula', 'Regal', 'Chris-Craft',
-      'Pursuit', 'Wellcraft', 'Monterey', 'Scout', 'Robalo',
-      'Bertram', 'Hatteras', 'Viking', 'Tiara', 'Carver',
-      'Cruisers', 'Fountain', 'Malibu', 'Nautique', 'Tige',
-      'Tracker', 'Ranger', 'Lund', 'Crestliner', 'Four Winns',
-      'Harris', 'Bennington', 'Sylvan', 'Hurricane', 'Starcraft',
-      'Yamaha', 'Carolina Skiff', 'Parker', 'Everglades', 'Jupiter',
-      'Intrepid', 'Yellowfin', 'Contender', 'Mako', 'Regulator'
+      'Sea Ray', 'Bayliner', 'Boston Whaler', 'Chaparral',
+      'Grady-White', 'MasterCraft', 'Chris-Craft', 'Bertram'
     ];
     
-    // Regular expression to try to find mentions of manufacturers
-    // Breaking up the regex to reduce complexity
-    const prefixes = '(manufactured by|made by|from|by|appears to be a|looks like a)';
-    const options = manufacturers.join('|');
-    const manufacturerRegex = new RegExp(`${prefixes} (${options})`, 'i');
-    const match = manufacturerRegex.exec(analysisText);
-    
-    if (match?.[2]) {
-      return match[2].trim();
-    }
-    
-    // If regex didn't work, try simple inclusion
     for (const manufacturer of manufacturers) {
-      if (analysisText.includes(manufacturer)) {
+      if (text.includes(manufacturer)) {
         return manufacturer;
       }
     }
     
-    return undefined;
+    return 'unknown';
   }
   
-  /**
-   * Identify model from analysis text
-   * @param analysisText The text analysis from OpenAI
-   * @returns Identified model or undefined
-   */
-  private identifyModel(analysisText: string): string | undefined {
-    // This is harder to extract generically since models are manufacturer-specific
-    // Try to find model numbers (e.g., "280", "Sundancer 320")
-    // Simplified model regex to reduce complexity
-    const modelRegex = /model (\w+[\s-]?\d+)|(\w+[\s-]?\d+) model/i;
-    const match = modelRegex.exec(analysisText);
+  private extractYear(text: string): number {
+    // Look for 4-digit years between 1900 and current year
+    const currentYear = new Date().getFullYear();
+    const yearRegex = /\b(19\d{2}|20\d{2})\b/g;
+    const years = text.match(yearRegex);
     
-    if (match) {
-      // Return the first non-undefined group
-      for (let i = 1; i < match.length; i++) {
-        if (match[i]) {
-          return match[i].trim();
-        }
-      }
-    }
-    
-    return undefined;
-  }
-  
-  /**
-   * Estimate boat size from analysis text
-   * @param analysisText The text analysis from OpenAI
-   * @returns Estimated dimensions
-   */
-  public estimateBoatSize(analysisText: string): { length?: number; beam?: number; draft?: number } {
-    const dimensions = {
-      length: undefined as number | undefined,
-      beam: undefined as number | undefined,
-      draft: undefined as number | undefined
-    };
-    
-    // Look for length mentions
-    const lengthRegex = /(\d+(?:\.\d+)?)\s*(?:foot|feet|ft|')/i;
-    const lengthMatch = lengthRegex.exec(analysisText);
-    
-    if (lengthMatch?.[1]) {
-      dimensions.length = parseFloat(lengthMatch[1]);
-    }
-    
-    // Look for beam mentions
-    const beamRegex = /beam(?:\s+of)?\s+(\d+(?:\.\d+)?)\s*(?:foot|feet|ft|')/i;
-    const beamMatch = beamRegex.exec(analysisText);
-    
-    if (beamMatch?.[1]) {
-      dimensions.beam = parseFloat(beamMatch[1]);
-    }
-    
-    // Look for draft mentions
-    const draftRegex = /draft(?:\s+of)?\s+(\d+(?:\.\d+)?)\s*(?:foot|feet|ft|')/i;
-    const draftMatch = draftRegex.exec(analysisText);
-    
-    if (draftMatch?.[1]) {
-      dimensions.draft = parseFloat(draftMatch[1]);
-    }
-    
-    return dimensions;
-  }
-  
-  /**
-   * Identify suitable activities for the boat
-   * @param analysisText The text analysis from OpenAI
-   * @returns Array of suitable activities
-   */
-  private identifySuitableActivities(analysisText: string): string[] {
-    // Common boat activities
-    const activities = [
-      'fishing', 'cruising', 'watersports', 'water skiing', 'wakeboarding',
-      'tubing', 'diving', 'snorkeling', 'entertaining', 'day trips',
-      'overnight stays', 'coastal cruising', 'offshore boating', 'racing',
-      'sailing', 'family outings', 'relaxing', 'swimming'
-    ];
-    
-    // Extract mentioned activities
-    const suitableActivities: string[] = [];
-    
-    activities.forEach(activity => {
-      if (analysisText.toLowerCase().includes(activity.toLowerCase())) {
-        // Capitalize first letter of each word
-        const formattedActivity = activity
-          .split(' ')
-          .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-          .join(' ');
-        
-        suitableActivities.push(formattedActivity);
-      }
-    });
-    
-    // If no activities were found, add some generic ones based on boat type
-    if (suitableActivities.length === 0) {
-      const boatType = this.identifyBoatType(analysisText)?.toLowerCase();
+    if (years && years.length > 0) {
+      // Find the most likely year (closest to current year)
+      const validYears = years
+        .map(y => parseInt(y))
+        .filter(y => y >= 1900 && y <= currentYear);
       
-      if (boatType?.includes('fish') || boatType?.includes('center console') || boatType?.includes('skiff')) {
-        suitableActivities.push('Fishing');
-      }
-      
-      if (boatType?.includes('cruise') || boatType?.includes('yacht')) {
-        suitableActivities.push('Cruising');
-        suitableActivities.push('Entertaining');
-      }
-      
-      if (boatType?.includes('ski') || boatType?.includes('wake')) {
-        suitableActivities.push('Watersports');
-      }
-      
-      if (boatType?.includes('pontoon') || boatType?.includes('deck')) {
-        suitableActivities.push('Family Outings');
-        suitableActivities.push('Relaxing');
-      }
-      
-      // Add a generic activity if still empty
-      if (suitableActivities.length === 0) {
-        suitableActivities.push('Boating');
+      if (validYears.length > 0) {
+        return validYears.reduce((a, b) => 
+          Math.abs(currentYear - a) < Math.abs(currentYear - b) ? a : b
+        );
       }
     }
     
-    return suitableActivities;
+    return 0;
   }
   
-  /**
-   * Generate a concise description from analysis text
-   * @param analysisText The text analysis from OpenAI
-   * @returns Concise description
-   */
-  private generateDescription(analysisText: string): string {
-    // Use the first 2-3 sentences of the analysis for a concise description
-    const sentences = analysisText.split(/[.!?]+/).filter(s => s.trim().length > 0);
+  private extractLength(text: string): number {
+    // Look for patterns like "XX feet", "XX ft", "XX'"
+    const lengthRegex = /\b(\d{1,3})(?:\s*(?:feet|foot|ft|'))/i;
+    const match = text.match(lengthRegex);
     
-    if (sentences.length <= 3) {
-      return sentences.join('. ') + '.';
-    } else {
-      return sentences.slice(0, 3).join('. ') + '.';
-    }
-  }
-  
-  /**
-   * Calculate confidence score based on detail level of analysis
-   * @param analysisText The text analysis from OpenAI
-   * @returns Confidence score between 0 and 1
-   */
-  /**
-   * Format the estimated size in a readable way without nested template literals
-   * @param estimatedSize The size dimensions object
-   * @returns Formatted size string
-   */
-  private formatEstimatedSize(estimatedSize: { length?: number; beam?: number; draft?: number }): string {
-    const lengthText = estimatedSize.length ? `${estimatedSize.length} ft` : 'Unknown';
-    let sizeText = `${lengthText} length`;
-    
-    if (estimatedSize.beam) {
-      sizeText += ` x ${estimatedSize.beam} ft beam`;
+    if (match && match[1]) {
+      return parseInt(match[1]);
     }
     
-    if (estimatedSize.draft) {
-      sizeText += ` x ${estimatedSize.draft} ft draft`;
-    }
-    
-    return sizeText;
-  }
-  
-  /**
-   * Calculate confidence score based on detail level of analysis
-   * @param analysisText The text analysis from OpenAI
-   * @returns Confidence score between 0 and 1
-   */
-  private calculateConfidenceScore(analysisText: string): number {
-    let score = 0.5; // Start with a neutral score
-    
-    // Higher score for longer, more detailed analysis
-    if (analysisText.length > 500) score += 0.1;
-    if (analysisText.length > 1000) score += 0.1;
-    
-    // Higher score for specific details
-    if (this.identifyBoatType(analysisText)) score += 0.1;
-    if (this.identifyManufacturer(analysisText)) score += 0.1;
-    if (this.identifyModel(analysisText)) score += 0.1;
-    
-    const features = this.extractFeatures(analysisText);
-    if (features.length > 3) score += 0.05;
-    if (features.length > 7) score += 0.05;
-    
-    // Cap the score at 1.0
-    return Math.min(score, 1.0);
+    return 0;
   }
 }
+
+/**
+ * Standalone function for analyzing boat images - for React Native compatibility
+ * @param base64Image Base64 encoded image to analyze
+ * @returns Analysis results with boat features
+ */
+export const analyzeBoatImage = async (base64Image: string): Promise<any> => {
+  try {
+    // This is a simplified implementation for React Native
+    // In a real implementation, this would connect to OpenAI API
+    
+    // Simulate analysis delay
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    // Return mock analysis results (this would normally come from AI)
+    return {
+      boatType: 'yacht',
+      confidence: 0.85,
+      features: [
+        'White hull',
+        'Two decks', 
+        'Flybridge',
+        'Hull windows',
+        'Swim platform',
+        'Radar dome'
+      ],
+      dimensions: {
+        length: '42ft',
+        beam: '14ft',
+        draft: '3.5ft'
+      },
+      manufacturer: 'Sample Manufacturer',
+      year: 2022,
+      estimatedValue: '$550,000 - $650,000'
+    };
+  } catch (error) {
+    console.error('Error analyzing boat image:', error);
+    return {
+      boatType: 'unknown',
+      confidence: 0,
+      features: [],
+      error: error instanceof Error ? error.message : 'Unknown error occurred'
+    };
+  }
+};
 
 // Export singleton instance 
 export const imageAnalysisService = new ImageAnalysisService();

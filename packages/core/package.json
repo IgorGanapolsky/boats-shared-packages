@@ -1,5 +1,5 @@
 {
-  "name": "@igorganapolsky/boats-core",
+  "name": "@boats/core",
   "version": "0.1.0",
   "description": "Core business logic and utilities for Boats.com applications",
   "main": "dist/index.js",
@@ -10,18 +10,18 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsup src/index.ts --format esm,cjs",
-    "build:dts": "tsup src/index.ts --format esm,cjs --dts",
+    "build": "tsup src/index.ts --format esm,cjs --external '@boats/types'",
+    "build:dts": "tsup src/index.ts --format esm,cjs --dts --ignore-watch node_modules --external '@boats/types'",
     "dev": "tsup src/index.ts --format esm,cjs --dts --watch",
     "lint": "eslint \"src/**/*.ts*\"",
     "clean": "rm -rf dist",
     "test": "jest"
   },
   "dependencies": {
-    "@igorganapolsky/boats-types": "^0.1.0"
+    "@boats/types": "^0.1.0",
+    "openai": "^4.11.1"
   },
   "peerDependencies": {
-    "openai": "^4.0.0",
     "@tensorflow/tfjs": "^4.0.0"
   },
   "devDependencies": {
